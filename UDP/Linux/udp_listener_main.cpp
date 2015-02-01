@@ -1,38 +1,42 @@
-#define WIN32_LEAN_AND_MEAN
-
-#include <winsock2.h>
-#include <Ws2tcpip.h>
 #include <stdio.h>
-
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <sys/wait.h>
 #include <iostream>
 #include <string>
-#pragma comment(lib, "Ws2_32.lib")
+
+/**
+  * @author Neelay Junnarkar
+  * 
+  * A UDP Listening program
+  *
+  * Status: Works, Jan. 31, 2015
+  */
 
 #define PORT "4950"
 #define BYTESMAX 100
-
-SOCKET sockfd = INVALID_SOCKET;
-int status;
-addrinfo hints, *servinfo, *p;
-sockaddr_storage their_addr;
-socklen_t addr_len;
-char s[INET_ADDRSTRLEN];
-int bytesn;
-char buf[BYTESMAX];
 
 timeval tv;
 fd_set masterfds, readfds;
 int fdmax;
 
-int main() {
-	WSADATA wsaData;
-	status = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	if (status != 0) {
-		printf("WSAStartup failed with error: %d\n", status);
-		std::cin.ignore();
-		return 1;
-	}
+int sockfd;
+int status;
+struct addrinfo hints, *servinfo, *p;
+struct sockaddr_storage their_addr;
+socklen_t addr_len;;
+char s[INET_ADDRSTRLEN];
+int bytesn;
+char buf[BYTESMAX];
 
+int main() {
 	tv.tv_sec = 10;
 	tv.tv_usec = 0;
 	FD_ZERO(&masterfds);
@@ -45,48 +49,40 @@ int main() {
 
 	if ((status = getaddrinfo(NULL, PORT, &hints, &servinfo)) != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
-		WSACleanup();
 		return 1;
 	}
 
 	for (p = servinfo; p != nullptr; p = p->ai_next) {
-		if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == INVALID_SOCKET) {
+		if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
 			std::cerr << "server: socket" << std::endl;
 			continue;
 		}
 
-		if (bind(sockfd, p->ai_addr, p->ai_addrlen) == SOCKET_ERROR) {
-			closesocket(sockfd);
+		if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+			close(sockfd);
 			std::cerr << "server: bind" << std::endl;
 			continue;
 		}
 
 		break;
 	}
-
 	freeaddrinfo(servinfo);
-
-	if (sockfd == INVALID_SOCKET) {
-		printf("Unable to connect to server!\n");
-		WSACleanup();
-		std::cin.ignore();
-		return 1;
+	if (p == nullptr) {
+		fprintf(stderr, "server: failed to bind\n");
+		return 2;
 	}
+
 	FD_SET(sockfd, &masterfds);
 	FD_SET(sockfd, &readfds);
 	fdmax = sockfd;
 
 	while (true) {
-
 		readfds = masterfds;
 		if (select(fdmax + 1, &readfds, nullptr, nullptr, &tv) == -1) {
 			std::cerr << "select" << std::endl;
-			closesocket(sockfd);
-			WSACleanup();
-			std::cin.ignore();
+			close(sockfd);
 			return 1;
 		}
-
 		for (int i = 0; i <= fdmax; ++i) {
 			if (FD_ISSET(i, &readfds)) {
 				addr_len = sizeof their_addr;
@@ -95,14 +91,13 @@ int main() {
 				}
 				buf[bytesn] = '\0';
 				std::cout << "talker: " << buf << std::endl;
+
 				memset(&buf, 0, sizeof(buf));
 			}
 		}
-		std::cout << "end while loop" << std::endl;
 
 	}
-	closesocket(sockfd);
-	WSACleanup();
 
+	close(sockfd);
 	return 0;
 }

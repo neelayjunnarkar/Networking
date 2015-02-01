@@ -18,9 +18,13 @@
 #include <iostream>
 #include <string>
 
-/*
-A rpi class for listening to msgs from rpi to cRIO or roboRIO or whatever
-*/
+/**
+  * @author Neelay Junnarkar
+  *
+  * The UDP_Listener class
+  *
+  * Status: Works, Jan. 31, 2015
+  */
 
 #define BYTESMAX 100
 
@@ -35,10 +39,9 @@ private:
 	std::string msg;
 
 public:
-	UDP_Listener(std::string port = "4950");
+	UDP_Listener(const std::string &port = "4950");
 	~UDP_Listener();
 
-	inline std::string getIP() const { return ip; }
 	inline std::string getPort() const { return port; }
 
 	std::string recv();

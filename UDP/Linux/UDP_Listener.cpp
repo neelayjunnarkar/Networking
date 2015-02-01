@@ -1,8 +1,7 @@
 #include "UDP_Listener.h"
 
-UDP_Listener::UDP_Listener(std::string port) :
-	port(port)
-{
+UDP_Listener::UDP_Listener(const std::string &port) :
+port(port) {
 	int status;
 	struct addrinfo hints, *servinfo, *p;
 
@@ -36,8 +35,8 @@ UDP_Listener::UDP_Listener(std::string port) :
 
 	int bytesn;
 	std::string conn_msg = "cRIO: connection achieved";
-	if ((bytesn = sendto((int)sockfd, (char *)conn_msg.c_str(), (int)conn_msg.length(), 0,
-		(struct sockaddr *)p->ai_addr, (int)p->ai_addrlen)) == -1) {
+	if ((bytesn = sendto((int) sockfd, (char *) conn_msg.c_str(), (int) conn_msg.length(), 0,
+		(struct sockaddr *)p->ai_addr, (int) p->ai_addrlen)) == -1) {
 		std::cerr << "cRIO: failure at \"connection achieved sendto\"" << std::endl;
 	}
 
@@ -55,11 +54,12 @@ std::string  UDP_Listener::recv() {
 
 	if ((bytesn = recvfrom(sockfd, buf, BYTESMAX - 1, 0, (struct sockaddr *)&their_addr, &addr_len)) == -1) {
 		std::cerr << "recvfrom" << std::endl;
+		msg = "error";
+	} else {
+		buf[bytesn] = '\0';
+
+		msg.resize(bytesn);
+		msg = buf;
 	}
-	buf[bytesn] = '\0';
-
-	msg.resize(bytesn);
-	msg = buf;
-
 	return msg;
 }

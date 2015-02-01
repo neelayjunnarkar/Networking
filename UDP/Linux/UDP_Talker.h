@@ -12,6 +12,14 @@
 #include <iostream>
 #include <thread>
 
+/**
+  * @author Neelay Junnarkar
+  *
+  * The UDP_Talker class
+  *
+  * Status: Works, Jan. 31, 2015
+  */
+
 class UDP_Talker {
 	private:
 		std::string ip; //ip sending to

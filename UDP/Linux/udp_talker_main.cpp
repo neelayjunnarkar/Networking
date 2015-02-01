@@ -1,13 +1,3 @@
-/*
-Neelay Junnarkar
-================
-
-Unix UDP talker
-Works.
-Tested with udp_listener_main.cpp
-Send messages in format: <string>
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -21,6 +11,14 @@ Send messages in format: <string>
 #include <string>
 #include <iostream>
 #include <thread>
+
+/**
+  * @author Neelay Junnarkar
+  *
+  * UDP talker
+  *
+  * Status: Works, Jan. 31, 2015
+  */
 
 #define PORT "4950"
 

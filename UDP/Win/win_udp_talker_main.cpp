@@ -1,12 +1,3 @@
-/*
-Neelay Junnarkar
-================
-
-Windows UDP talker
-Works. 
-Tested with udp_listener_main.cpp
-Send messages in format: <string>
-*/
 #define WIN32_LEAN_AND_MEAN
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <winsock2.h>
@@ -18,6 +9,14 @@ Send messages in format: <string>
 #include <iostream>
 #include <string>
 #pragma comment(lib, "Ws2_32.lib")
+
+/**
+  * @author Neelay Junnarkar
+  * 
+  * Windows UDP talker
+  *
+  * Status: Works, Jan. 31, 2015
+  */
 
 #define PORT 4950
 #define LISTENERIP "192.168.2.100"
