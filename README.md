@@ -1,4 +1,5 @@
 Strawberry-Pi
 =============
 
-Networking, in intent of offloading data to rpi
+Networking. 
+Will be used in Team 8 robotics
