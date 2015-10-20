@@ -17,7 +17,11 @@ Endpoint::Endpoint(AddressFamily addressFamily, const char *ipAddress, u_short p
 		_data.v6.sin6_port = htons(_port);
 		int status = inet_pton((int)AddressFamily::V6, _ipAddress, &(_data.v6.sin6_addr));
 		if(status != 1) {
+#ifdef _WIN32
 			std::cerr << "pton error: " << status << " " << WSAGetLastError() << std::endl;
+#elif defined(__linux__) //end _WIN32
+			std::cerr << "pton error: " << status << std::endl;
+#endif
 		}
 	}
 }

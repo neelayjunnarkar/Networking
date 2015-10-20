@@ -1,9 +1,13 @@
+//This is used for testing functions of the library
+
 #include "Socket.h"
 
 #define MAXBYTES 128
 #define CLIENT
 
 int main() {
+
+#ifdef _WIN32
 	//initialize winsock
 	WSAData wsaData;
 	int status = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -13,6 +17,7 @@ int main() {
 		std::cin.ignore();
 		return 1;
 	}
+#endif //end _WIN32
 
 	Socket socket{AddressFamily::V4, SocketType::STREAM, ProtocolType::TCP};
 #ifdef CLIENT
@@ -41,5 +46,7 @@ int main() {
 	std::cout << "number of bytes sent: " << numbytes << std::endl;
 #endif
 	std::cin.ignore();
+#ifdef _WIN32
 	WSACleanup();
+#endif
 }
