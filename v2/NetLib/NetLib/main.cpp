@@ -3,7 +3,7 @@
 #include "Socket.h"
 
 #define MAXBYTES 128
-#define CLIENT
+#define SERVER
 
 int main() {
 

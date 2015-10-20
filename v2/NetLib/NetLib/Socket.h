@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <iostream>
+
 class Socket {
 public:
 	Socket(AddressFamily addressFamily, SocketType socketT, ProtocolType protocolT);
