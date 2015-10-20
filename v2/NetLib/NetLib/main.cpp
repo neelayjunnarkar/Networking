@@ -2,6 +2,7 @@
 
 #define MAXBYTES 128
 #define CLIENT
+
 int main() {
 	//initialize winsock
 	WSAData wsaData;
