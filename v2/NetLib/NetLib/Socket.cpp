@@ -6,15 +6,16 @@ Socket::Socket(AddressFamily addressFamily, SocketType socketT, ProtocolType pro
 	_protocolT{protocolT} {
 
 	_fileDescriptor = socket((int)_addressFamily, (int)_socketT, (int)_protocolT);
+
+	//error checking
+	if(_fileDescriptor == SocketError::FAILED_SOCKET) {
 #ifdef _WIN32
-	if(_fileDescriptor == INVALID_SOCKET) {
 		std::cerr << "error at socket(): " << WSAGetLastError() << std::endl;
-	}
 #elif defined(__linux__) //end _WIN32
-	if(_fileDescriptor == -1) {
 		std::cerr << "error at client(); file descriptor = " << _fileDescriptor << std::endl;
-	}
 #endif //end __linux__
+	} //end error checking
+
 
 }
 
@@ -22,18 +23,13 @@ int Socket::connect(const Socket &socket, Endpoint endpoint) {
 	int status = ::connect(socket._fileDescriptor, endpoint.data(), sizeof *endpoint.data());
 
 	//error checking
+	if(status == SocketError::GENERAL) {
 #ifdef _WIN32
-	if(status == SOCKET_ERROR) {
 		std::cerr << "error at connect(): " << WSAGetLastError() << std::endl;
-		return status;
-	}
-
 #elif defined(__linux__) //end _WIN32
-	if(status == -1) {
 		std::cerr << "error at connect(): " << status << std::endl;
-		return status;
-	}
 #endif //end __linux__
+	} //end error checking
 
 	return status;
 }
@@ -44,27 +40,18 @@ int Socket::connectTo(const Endpoint &endpoint) {
 
 int Socket::bind(const Socket &socket, Endpoint endpoint) {
 
-#ifdef _WIN32
-	int status = SOCKET_ERROR;
-#elif defined(__linux__) //end _WIN32
-	int status = -1;
-#endif //end __linux__
+	int status = SocketError::GENERAL;
 
 	status = ::bind(socket._fileDescriptor, endpoint.data(), sizeof *endpoint.data());
 
 	//error checking
+	if(status == SocketError::GENERAL) {
 #ifdef _WIN32
-	if(status == SOCKET_ERROR) {
 		std::cerr << "error at bind(): " << WSAGetLastError() << std::endl;
-		return status;
-	}
-
 #elif defined(__linux__) //end _WIN32
-	if(status == -1) {
 		std::cerr << "error at bind(): " << status << std::endl;
-		return status;
-	}
 #endif //end __linux__
+	} //end error checking
 
 	return status;
 }
@@ -78,31 +65,29 @@ Socket Socket::accept(Endpoint *const endpoint) { //should base properties of so
 	client._fileDescriptor = ::accept(_fileDescriptor, endpoint->data(), nullptr);
 
 	//error checking
+	if(client._fileDescriptor == SocketError::FAILED_SOCKET) {
 #ifdef _WIN32
-	if(client._fileDescriptor == SOCKET_ERROR)
 		std::cerr << "error at accept: " << WSAGetLastError() << std::endl;
-
 #elif defined(__linux__) //end _WIN32
-	if(client._fileDescriptor == -1)
 		std::cerr << "error at accept(); file descriptor = " << client._fileDescriptor << std::endl;
 #endif //end __linux__
-
+	} //end error checking
+	
 	return client;
 }
 
 int Socket::listen(unsigned maxBacklog) {
 	int status = ::listen(_fileDescriptor, maxBacklog);
+
+	//error checkin
+	if(status == SocketError::GENERAL) {
 #ifdef _WIN32
-	if(status == SOCKET_ERROR) {
 		std::cerr << "error at listen(): " << WSAGetLastError() << std::endl;
-		return status;
-	}
 #elif defined(__linux__) //end __WIN32
-	if(status == -1) {
 		std::cerr << "error at listen(): " << status << std::endl;
-		return status;
-	}
 #endif //end __linux__
+	} //end error checking
+
 	return status;
 }
 
@@ -117,11 +102,12 @@ int Socket::recv(char *bytes, unsigned byteslen, int flags) {
 		return numbytes;
 	}
 #elif defined(__linux__) //end _WIN32
-	if(numbytes == -1) {
+	if(numbytes == SocketError::GENERAL) {
 		std::cerr << "error at recv(): " << numbytes << std::endl;
 		return numbytes;
 	}
 #endif //end __linux__
+
 	bytes[numbytes] = '\0';
 	return numbytes;
 }

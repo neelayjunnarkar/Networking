@@ -2,6 +2,7 @@
 #include "AddressFamily.h"
 #include "SocketType.h"
 #include "ProtocolType.h"
+#include "Error.h"
 
 #include "Endpoint.h"
 
