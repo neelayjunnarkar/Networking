@@ -28,6 +28,10 @@
 #include <arpa/inet.h>
 #endif //end __linux__
 
+#if defined(_WIN32) && !defined(_MSC_VER)
+int inet_pton(int af, const char *src, void *dst);
+#endif
+
 class Endpoint {
 public:
 
