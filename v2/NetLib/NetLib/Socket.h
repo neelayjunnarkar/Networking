@@ -14,7 +14,7 @@ public:
 	Socket(AddressFamily addressFamily, SocketType socketT, ProtocolType protocolT);
 
 	static int connect(const Socket &socket, Endpoint endpoint);
-	int connectTo(const Endpoint &endpoint);
+	int connectTo(Endpoint endpoint);
 
 	static int bind(const Socket &socket, Endpoint endpoint);
 	int bindTo(const Endpoint &endpoint);

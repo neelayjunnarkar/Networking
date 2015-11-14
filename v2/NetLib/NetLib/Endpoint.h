@@ -34,7 +34,7 @@ public:
 	Endpoint(AddressFamily addressFamily, const char *ipAddress, u_short port);
 
 	sockaddr* data() {
-		return &_data.base;
+		return (sockaddr*)&_data;
 	}
 
 	AddressFamily addressFamily() const {

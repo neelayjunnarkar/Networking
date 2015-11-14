@@ -3,8 +3,10 @@
 #include "Socket.h"
 
 #define MAXBYTES 128
-#define SERVER
+#define CLIENT
 
+#define ADDRESS "10.32.78.207"
+#define PORT 4950
 int main() {
 
 #ifdef _WIN32
@@ -21,7 +23,7 @@ int main() {
 
 	Socket socket{AddressFamily::V4, SocketType::STREAM, ProtocolType::TCP};
 #ifdef CLIENT
-	socket.connectTo(Endpoint{AddressFamily::V4, "127.0.0.1", 4950});
+	socket.connectTo(Endpoint{AddressFamily::V4, ADDRESS, PORT});
 	char *message = "test sending message";
 	int numbytes = socket.send(message, strlen(message));
 	std::cout << "number of bytes sent: " << numbytes << std::endl;
@@ -33,7 +35,7 @@ int main() {
 
 
 #ifdef SERVER
-	socket.bindTo(Endpoint{AddressFamily::V4, "127.0.0.1", 4950});
+	socket.bindTo(Endpoint{AddressFamily::V4, "127.0.0.1", PORT});
 	socket.listen();
 	
 	Socket client = socket.accept();

@@ -20,7 +20,7 @@ Socket::Socket(AddressFamily addressFamily, SocketType socketT, ProtocolType pro
 }
 
 int Socket::connect(const Socket &socket, Endpoint endpoint) {
-	int status = ::connect(socket._fileDescriptor, endpoint.data(), sizeof *endpoint.data());
+	int status = ::connect(socket._fileDescriptor, endpoint.data(), sizeof *(endpoint.data()));
 
 	//error checking
 	if(status == SocketError::GENERAL) {
@@ -34,7 +34,7 @@ int Socket::connect(const Socket &socket, Endpoint endpoint) {
 	return status;
 }
 
-int Socket::connectTo(const Endpoint &endpoint) {
+int Socket::connectTo(Endpoint endpoint) {
 	return Socket::connect(*this, endpoint);
 }
 
@@ -42,7 +42,7 @@ int Socket::bind(const Socket &socket, Endpoint endpoint) {
 
 	int status = SocketError::GENERAL;
 
-	status = ::bind(socket._fileDescriptor, endpoint.data(), sizeof *endpoint.data());
+	status = ::bind(socket._fileDescriptor, endpoint.data(), sizeof *(endpoint.data()));
 
 	//error checking
 	if(status == SocketError::GENERAL) {
@@ -56,13 +56,13 @@ int Socket::bind(const Socket &socket, Endpoint endpoint) {
 	return status;
 }
 
-int Socket::bindTo(const Endpoint &endpoint) {
+int Socket::bindTo(Endpoint const &endpoint) {
 	return Socket::bind(*this, endpoint);
 }
 
 Socket Socket::accept(Endpoint *const endpoint) { //should base properties of socket based on properties of endpoint
 	Socket client{_addressFamily, _socketT, _protocolT};
-	client._fileDescriptor = ::accept(_fileDescriptor, endpoint->data(), nullptr);
+	client._fileDescriptor = ::accept(_fileDescriptor, nullptr, nullptr);
 
 	//error checking
 	if(client._fileDescriptor == SocketError::FAILED_SOCKET) {
