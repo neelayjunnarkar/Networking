@@ -92,24 +92,29 @@ int Socket::listen(unsigned maxBacklog) {
 }
 
 
-int Socket::recv(char *bytes, unsigned byteslen, int flags) {
-	int numbytes = ::recv(_fileDescriptor, bytes, byteslen, 0);
+char* Socket::recv(int *num_bytes, unsigned byteslen, int flags) {
+	char *bytes = new char[byteslen];
+	*num_bytes = ::recv(_fileDescriptor, bytes, byteslen, 0);
 
 	//error checking
 #ifdef _WIN32
-	if(numbytes < 0) {
+	if(*num_bytes < 0) {
 		std::cerr << "error at recv(): " << WSAGetLastError() << std::endl;
-		return numbytes;
+		return bytes;
 	}
 #elif defined(__linux__) //end _WIN32
-	if(numbytes == SocketError::GENERAL) {
+	if(*num_bytes == SocketError::GENERAL) {
 		std::cerr << "error at recv(): " << numbytes << std::endl;
-		return numbytes;
+		return bytes;
 	}
 #endif //end __linux__
 
-	bytes[numbytes] = '\0';
-	return numbytes;
+	bytes[*num_bytes] = '\0';
+	return bytes;
+}
+
+std::string Socket::recv(unsigned bytesLen, int flags) {
+	return std::string(recv(new int, bytesLen, flags));
 }
 
 int Socket::send(char *bytes, unsigned byteslen, int flags) {
@@ -126,4 +131,8 @@ int Socket::send(char *bytes, unsigned byteslen, int flags) {
 #endif //end __linux__
 
 	return numbytes;
+}
+
+int Socket::send(std::string bytes, int flags) {
+	return send((char*)bytes.c_str(), bytes.length(), flags);
 }

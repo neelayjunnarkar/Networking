@@ -11,7 +11,14 @@ Endpoint::Endpoint(AddressFamily addressFamily, const char *ipAddress, u_short p
 		if(strcmp(ipAddress, "127.0.0.1") == 0) {
 			_data.v4.sin_addr.s_addr = INADDR_ANY;
 		} else {
-			InetPton((int)AddressFamily::V4, _ipAddress, &_data.v4.sin_addr.s_addr);
+			int status = InetPton((int)AddressFamily::V4, _ipAddress, &_data.v4.sin_addr.s_addr);
+			if(status != 1) {
+#ifdef _WIN32
+				std::cerr << "pton error: " << status << " " << WSAGetLastError() << std::endl;
+#elif defined(__linux__) //end _WIN32
+				std::cerr << "pton error: " << status << std::endl;
+#endif
+			}
 		}
 	} else if(_addressFamily == AddressFamily::V6) {
 
